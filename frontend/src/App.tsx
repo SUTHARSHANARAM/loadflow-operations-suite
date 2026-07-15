@@ -1392,13 +1392,11 @@ export default function App() {
                           <td style={{ padding: '16px', fontWeight: 600, color: '#fff' }}>{s.name}</td>
                           <td style={{ padding: '16px', color: 'hsl(var(--text-secondary))' }}>{s.email}</td>
                           <td style={{ padding: '16px' }}>
-                            <span style={{
-                              background: 'rgba(255,255,255,0.05)',
+                            <span className="badge" style={{
+                              background: 'rgba(255,255,255,0.04)',
                               border: '1px solid hsl(var(--border-color))',
-                              padding: '4px 8px',
-                              borderRadius: '4px',
-                              fontSize: '12px',
-                              color: '#fff'
+                              color: '#fff',
+                              whiteSpace: 'nowrap'
                             }}>
                               {s.role_id ? 'Scoped Role' : 'Org Admin'}
                             </span>
@@ -1406,13 +1404,11 @@ export default function App() {
                           <td style={{ padding: '16px' }}>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                               {s.permissions.map(p => (
-                                <span key={p} style={{
-                                  background: 'rgba(124, 58, 237, 0.1)',
+                                <span key={p} className="badge" style={{
+                                  background: 'rgba(99, 102, 241, 0.06)',
+                                  border: '1px solid rgba(99, 102, 241, 0.15)',
                                   color: 'hsl(var(--primary))',
-                                  fontSize: '11px',
-                                  padding: '2px 6px',
-                                  borderRadius: '4px',
-                                  fontWeight: 600
+                                  whiteSpace: 'nowrap'
                                 }}>
                                   {p}
                                 </span>
