@@ -5,7 +5,20 @@ import {
   Upload, ShieldAlert, BookOpen, Clock, User
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:8000/api';
+const getApiBase = () => {
+  let url = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+  
+  // Automatic fallback: If deployed on Vercel but the API URL points to localhost or self,
+  // override it to point directly to the live Render backend.
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    if (url.includes('localhost') || url.includes(window.location.hostname)) {
+      url = 'https://loadflow-operations-suite.onrender.com/api';
+    }
+  }
+  
+  return url.endsWith('/api') || url.endsWith('/api/') ? url : `${url.replace(/\/$/, '')}/api`;
+};
+const API_BASE = getApiBase();
 
 // Helper types
 interface Organization {
@@ -148,12 +161,33 @@ export default function App() {
   const [compCommodities, setCompCommodities] = useState<string[]>([]);
 
   // Toast notifications
-  const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
+  const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'waking'>('checking');
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
   };
+
+  // Ping server on mount to wake up Render free tier from cold start
+  useEffect(() => {
+    const pingServer = async () => {
+      try {
+        const res = await fetch(`${API_BASE.replace('/api', '')}`, { method: 'GET' });
+        if (res.ok || res.status === 405) {
+          setServerStatus('online');
+        } else {
+          setServerStatus('waking');
+          // Retry after 5s
+          setTimeout(pingServer, 5000);
+        }
+      } catch {
+        setServerStatus('waking');
+        setTimeout(pingServer, 5000);
+      }
+    };
+    pingServer();
+  }, []);
 
   // API Call helper
   const apiCall = async (endpoint: string, options: RequestInit = {}) => {
@@ -165,13 +199,17 @@ export default function App() {
       headers.set('Content-Type', 'application/json');
     }
 
-    const res = await fetch(`${API_BASE}${endpoint}`, {
-      ...options,
-      headers
-    });
+    let res: Response;
+    try {
+      res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+    } catch {
+      throw new Error('Cannot reach server — it may be starting up. Please wait 30 seconds and try again.');
+    }
 
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: 'API Error occurred' }));
+      const err = await res.json().catch(() => ({
+        detail: `Server returned ${res.status}. If this is your first request, the server may be waking up — please wait 30 seconds and try again.`
+      }));
       throw new Error(err.detail || 'Request failed');
     }
 
@@ -633,6 +671,31 @@ export default function App() {
               </p>
             </div>
 
+            {serverStatus === 'checking' && (
+              <div style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', padding: '10px 16px', borderRadius: '8px', color: '#a5b4fc', fontSize: '13px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>⏳</span><span>Connecting to API...</span>
+                </div>
+                <span style={{ fontSize: '11px', opacity: 0.7, wordBreak: 'break-all' }}>Target: {API_BASE}</span>
+              </div>
+            )}
+            {serverStatus === 'waking' && (
+              <div style={{ background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.3)', padding: '10px 16px', borderRadius: '8px', color: '#fde047', fontSize: '13px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>⚡</span><span>Server waking up (free tier)...</span>
+                </div>
+                <span style={{ fontSize: '11px', opacity: 0.7, wordBreak: 'break-all' }}>Target: {API_BASE}</span>
+              </div>
+            )}
+            {serverStatus === 'online' && !authError && (
+              <div style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', padding: '10px 16px', borderRadius: '8px', color: '#6ee7b7', fontSize: '13px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>✅</span><span>Server online</span>
+                </div>
+                <span style={{ fontSize: '11px', opacity: 0.7, wordBreak: 'break-all' }}>Target: {API_BASE}</span>
+              </div>
+            )}
+
             {authError && (
               <div style={{
                 background: 'rgba(244, 63, 94, 0.1)',
@@ -643,11 +706,16 @@ export default function App() {
                 fontSize: '14px',
                 marginBottom: '24px',
                 display: 'flex',
-                alignItems: 'center',
+                flexDirection: 'column',
                 gap: '8px'
               }}>
-                <AlertTriangle size={18} />
-                <span>{authError}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertTriangle size={18} />
+                  <span>{authError}</span>
+                </div>
+                <div style={{ fontSize: '12px', opacity: 0.8, borderTop: '1px solid rgba(244,63,94,0.2)', paddingTop: '8px', wordBreak: 'break-all' }}>
+                  Attempted endpoint: <strong>{API_BASE}/auth/login</strong>
+                </div>
               </div>
             )}
 
