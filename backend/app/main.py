@@ -2,6 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import auth, rbac, loads, compliance, rates, logs
 
+from app.init_db import init_database
+
+init_database()
+
 app = FastAPI(title="LoadFlow - Freight Brokerage Operations Suite API")
 
 # Setup CORS

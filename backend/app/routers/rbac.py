@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas import RoleCreate, RoleResponse, PermissionResponse, UserStaffCreate, UserResponse
+from app.schemas import RoleCreate, RoleResponse, PermissionResponse, UserStaffCreate, UserResponse, OrgResponse
 from app.services.rbac_service import RbacService
 from app.services.auth_service import AuthService
 from app.permissions import PermissionChecker, get_current_user
@@ -82,3 +82,39 @@ def get_staff(
             "permissions": perms
         })
     return response_list
+
+@router.get("/carriers", response_model=List[OrgResponse])
+def get_carriers(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.account_type != "broker":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only brokers can list carriers"
+        )
+    from app.models.org import Organization
+    return db.query(Organization).filter(Organization.type == "carrier").all()
+
+@router.get("/shippers", response_model=List[UserResponse])
+def get_shippers(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.account_type != "broker":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only brokers can list shippers"
+        )
+    shippers = db.query(User).filter(User.account_type == "shipper").all()
+    return [{
+        "id": s.id,
+        "name": s.name,
+        "email": s.email,
+        "account_type": s.account_type,
+        "org_id": s.org_id,
+        "role_id": s.role_id,
+        "org": s.org,
+        "permissions": []
+    } for s in shippers]
+
