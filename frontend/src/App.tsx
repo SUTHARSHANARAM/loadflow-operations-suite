@@ -1020,26 +1020,26 @@ export default function App() {
 
                       {/* Carrier Compliance info if carrier is assigned */}
                       {selectedLoad.carrier_id && complianceMap[selectedLoad.carrier_id] && (
-                        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '8px', border: '1px solid hsl(var(--border-color))', marginBottom: '24px' }}>
-                          <h4 style={{ fontSize: '14px', marginBottom: '12px', color: '#fff', fontWeight: 600 }}>Assigned Carrier Compliance</h4>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '13px' }}>
+                        <div style={{ background: 'rgba(255,255,255,0.01)', padding: '18px', borderRadius: '8px', border: '1px solid hsl(var(--border-color))', marginBottom: '24px' }}>
+                          <h4 style={{ fontSize: '14px', marginBottom: '16px', color: '#fff', fontWeight: 600 }}>Assigned Carrier Compliance</h4>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '13px' }}>
                             <div>
-                              <p style={{ color: 'hsl(var(--text-muted))' }}>FMCSA Authority</p>
-                              <span style={{ 
-                                fontWeight: 700, 
-                                color: complianceMap[selectedLoad.carrier_id].authority_status === 'Active' ? 'hsl(var(--success))' : 'hsl(var(--danger))' 
-                              }}>
+                              <p style={{ color: 'hsl(var(--text-secondary))', marginBottom: '6px', fontSize: '12px' }}>FMCSA Authority</p>
+                              <span className={`badge ${complianceMap[selectedLoad.carrier_id].authority_status === 'Active' ? 'badge-success' : 'badge-danger'}`}>
                                 {complianceMap[selectedLoad.carrier_id].authority_status}
                               </span>
                             </div>
                             <div>
-                              <p style={{ color: 'hsl(var(--text-muted))' }}>Insurance Expiry</p>
-                              <span style={{ 
-                                fontWeight: 700,
-                                color: new Date(complianceMap[selectedLoad.carrier_id].insurance_expiry || '') < new Date() ? 'hsl(var(--danger))' : 'hsl(var(--success))'
-                              }}>
-                                {complianceMap[selectedLoad.carrier_id].insurance_expiry || 'Lapsed/Missing'}
-                              </span>
+                              <p style={{ color: 'hsl(var(--text-secondary))', marginBottom: '6px', fontSize: '12px' }}>Insurance Expiry</p>
+                              {(() => {
+                                const expiry = complianceMap[selectedLoad.carrier_id].insurance_expiry;
+                                const isExpired = !expiry || new Date(expiry) < new Date();
+                                return (
+                                  <span className={`badge ${isExpired ? 'badge-danger' : 'badge-success'}`}>
+                                    {expiry || 'Lapsed/Missing'}
+                                  </span>
+                                );
+                              })()}
                             </div>
                           </div>
                         </div>
@@ -1052,22 +1052,42 @@ export default function App() {
                           <span className={`badge ${getStatusBadgeClass(selectedLoad.status)}`}>{selectedLoad.status}</span>
                         </div>
                         
-                        {/* Map-like visual track */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
+                        {/* Map-like visual track - Premium Vertical Stepper */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px', marginBottom: '24px', paddingLeft: '8px' }}>
                           {["Posted", "Carrier Assigned", "Rate Confirmed", "Dispatched", "In Transit", "Delivered", "POD Verified", "Closed"].map((st, i) => {
                             const activeIdx = getStatusFlowIndex(selectedLoad.status);
-                            const isPast = i <= activeIdx;
+                            const isCurrent = i === activeIdx;
+                            const isPast = i < activeIdx;
                             return (
-                              <React.Fragment key={st}>
+                              <div key={st} style={{ display: 'flex', alignItems: 'center', gap: '16px', position: 'relative' }}>
+                                {i < 7 && (
+                                  <div style={{
+                                    position: 'absolute',
+                                    left: '7px',
+                                    top: '18px',
+                                    bottom: '-22px',
+                                    width: '2px',
+                                    background: isPast ? 'hsl(var(--primary))' : 'rgba(255,255,255,0.06)'
+                                  }} />
+                                )}
                                 <div style={{ 
-                                  width: '10px', 
-                                  height: '10px', 
+                                  width: '16px', 
+                                  height: '16px', 
                                   borderRadius: '50%', 
-                                  background: isPast ? 'hsl(var(--primary))' : 'rgba(255,255,255,0.1)',
-                                  boxShadow: isPast ? '0 0 8px hsl(var(--primary))' : 'none'
-                                }} title={st} />
-                                {i < 7 && <div style={{ flex: 1, height: '2px', background: i < activeIdx ? 'hsl(var(--primary))' : 'rgba(255,255,255,0.1)' }} />}
-                              </React.Fragment>
+                                  border: `2px solid ${isCurrent || isPast ? 'hsl(var(--primary))' : 'rgba(255,255,255,0.15)'}`,
+                                  background: isCurrent ? 'hsl(var(--primary))' : 'transparent',
+                                  boxShadow: isCurrent ? '0 0 10px hsl(var(--primary))' : 'none',
+                                  zIndex: 1,
+                                  transition: 'all var(--transition-normal)'
+                                }} />
+                                <span style={{ 
+                                  fontSize: '13px', 
+                                  fontWeight: isCurrent ? 700 : 500,
+                                  color: isCurrent ? '#fff' : isPast ? 'hsl(var(--text-secondary))' : 'hsl(var(--text-muted))'
+                                }}>
+                                  {st}
+                                </span>
+                              </div>
                             );
                           })}
                         </div>
