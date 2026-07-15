@@ -42,6 +42,17 @@ class ComplianceService:
             
         db.commit()
         db.refresh(record)
+
+        # Re-evaluate compliance flags for all active loads assigned to this carrier
+        active_loads = db.query(Load).filter(
+            Load.carrier_id == carrier_id,
+            Load.status.notin_(["Closed"])
+        ).all()
+        for load in active_loads:
+            is_compliant = ComplianceService.check_carrier_compliance(db, carrier_id, load)
+            load.compliance_flag = not is_compliant
+        db.commit()
+
         return record
 
     @staticmethod

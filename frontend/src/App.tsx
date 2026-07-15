@@ -929,8 +929,7 @@ export default function App() {
                               className="card"
                               style={{ 
                                 cursor: 'pointer',
-                                borderColor: selectedLoad?.id === load.id ? 'hsl(var(--primary))' : 'hsl(var(--border-color))',
-                                position: 'relative'
+                                borderColor: selectedLoad?.id === load.id ? 'hsl(var(--primary))' : 'hsl(var(--border-color))'
                               }}
                               onClick={() => {
                                 setSelectedLoad(load);
@@ -939,31 +938,19 @@ export default function App() {
                                 }
                               }}
                             >
-                              {load.compliance_flag && (
-                                <div style={{
-                                  position: 'absolute',
-                                  top: '16px',
-                                  right: '16px',
-                                  background: 'rgba(239, 68, 68, 0.1)',
-                                  border: '1px solid rgba(239, 68, 68, 0.4)',
-                                  color: '#f87171',
-                                  padding: '4px 8px',
-                                  borderRadius: '4px',
-                                  fontSize: '11px',
-                                  fontWeight: 800,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '4px'
-                                }}>
-                                  <AlertTriangle size={12} />
-                                  <span>COMPLIANCE HOLD</span>
-                                </div>
-                              )}
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                                 <h3 style={{ fontSize: '18px', color: '#fff' }}>{load.title}</h3>
-                                <span className={`badge ${getStatusBadgeClass(load.status)}`}>
-                                  {load.status}
-                                </span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  {load.compliance_flag && (
+                                    <span className="badge badge-danger" style={{ gap: '4px' }}>
+                                      <AlertTriangle size={12} />
+                                      <span>COMPLIANCE HOLD</span>
+                                    </span>
+                                  )}
+                                  <span className={`badge ${getStatusBadgeClass(load.status)}`}>
+                                    {load.status}
+                                  </span>
+                                </div>
                               </div>
 
                               <div style={{ display: 'flex', gap: '24px', color: 'hsl(var(--text-secondary))', fontSize: '14px', marginBottom: '16px' }}>
