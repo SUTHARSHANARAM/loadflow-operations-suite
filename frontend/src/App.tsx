@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   Shield, FileText, Users, Activity, LogOut, 
   Plus, MapPin, Truck, AlertTriangle, CheckCircle, 
-  Upload, ShieldAlert, BookOpen, Clock, User
+  Upload, ShieldAlert, BookOpen, Clock, User,
+  Eye, EyeOff
 } from 'lucide-react';
 
 const getApiBase = () => {
@@ -163,6 +164,7 @@ export default function App() {
   // Toast notifications
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'waking'>('checking');
+  const [showPassword, setShowPassword] = useState(false);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
@@ -717,14 +719,37 @@ export default function App() {
                 </div>
                 <div className="input-group" style={{ marginBottom: '28px' }}>
                   <label className="input-label">Password</label>
-                  <input 
-                    type="password" 
-                    required 
-                    className="input-field" 
-                    placeholder="••••••••"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      required 
+                      className="input-field" 
+                      placeholder="••••••••"
+                      style={{ paddingRight: '40px' }}
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: 'rgba(255, 255, 255, 0.4)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '4px'
+                      }}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
                 <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '14px' }}>
                   Sign In to Suite
@@ -756,14 +781,37 @@ export default function App() {
                 </div>
                 <div className="input-group">
                   <label className="input-label">Password</label>
-                  <input 
-                    type="password" 
-                    required 
-                    className="input-field" 
-                    placeholder="Minimum 6 characters"
-                    value={regPassword}
-                    onChange={(e) => setRegPassword(e.target.value)}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      required 
+                      className="input-field" 
+                      placeholder="Minimum 6 characters"
+                      style={{ paddingRight: '40px' }}
+                      value={regPassword}
+                      onChange={(e) => setRegPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: 'rgba(255, 255, 255, 0.4)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '4px'
+                      }}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
                 <div className="input-group">
                   <label className="input-label">Account Type</label>
