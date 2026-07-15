@@ -747,7 +747,7 @@ export default function App() {
                         padding: '4px'
                       }}
                     >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                     </button>
                   </div>
                 </div>
@@ -809,7 +809,7 @@ export default function App() {
                         padding: '4px'
                       }}
                     >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                     </button>
                   </div>
                 </div>
