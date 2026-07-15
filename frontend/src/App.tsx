@@ -8,10 +8,10 @@ import {
 const getApiBase = () => {
   let url = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
   
-  // Automatic fallback: If deployed on Vercel but the API URL points to localhost or self,
+  // Automatic fallback: If deployed on Vercel but the API URL points to localhost, self, or the example URL,
   // override it to point directly to the live Render backend.
   if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    if (url.includes('localhost') || url.includes(window.location.hostname)) {
+    if (url.includes('localhost') || url.includes(window.location.hostname) || url.includes('loadflow-api.onrender.com')) {
       url = 'https://loadflow-operations-suite.onrender.com/api';
     }
   }
