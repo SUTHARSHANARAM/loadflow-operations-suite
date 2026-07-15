@@ -671,28 +671,11 @@ export default function App() {
               </p>
             </div>
 
-            {serverStatus === 'checking' && (
-              <div style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', padding: '10px 16px', borderRadius: '8px', color: '#a5b4fc', fontSize: '13px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>⏳</span><span>Connecting to API...</span>
-                </div>
-                <span style={{ fontSize: '11px', opacity: 0.7, wordBreak: 'break-all' }}>Target: {API_BASE}</span>
-              </div>
-            )}
             {serverStatus === 'waking' && (
               <div style={{ background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.3)', padding: '10px 16px', borderRadius: '8px', color: '#fde047', fontSize: '13px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span>⚡</span><span>Server waking up (free tier)...</span>
                 </div>
-                <span style={{ fontSize: '11px', opacity: 0.7, wordBreak: 'break-all' }}>Target: {API_BASE}</span>
-              </div>
-            )}
-            {serverStatus === 'online' && !authError && (
-              <div style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', padding: '10px 16px', borderRadius: '8px', color: '#6ee7b7', fontSize: '13px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>✅</span><span>Server online</span>
-                </div>
-                <span style={{ fontSize: '11px', opacity: 0.7, wordBreak: 'break-all' }}>Target: {API_BASE}</span>
               </div>
             )}
 
